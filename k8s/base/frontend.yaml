@@ -7,7 +7,7 @@ metadata:
     app: mindquest
     component: frontend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: mindquest
@@ -20,7 +20,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/vinodkumarpeddi/mindquest-frontend:latest
+          image: mindquest-frontend:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 80
           resources:
@@ -30,27 +31,12 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 3
-            periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mindquest-frontend
   namespace: mindquest
-  labels:
-    app: mindquest
-    component: frontend
 spec:
   selector:
     app: mindquest
@@ -58,5 +44,3 @@ spec:
   ports:
     - port: 80
       targetPort: 80
-      protocol: TCP
-  type: ClusterIP

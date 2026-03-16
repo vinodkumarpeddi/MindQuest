@@ -396,41 +396,48 @@ def summarize_session():
             top_ideas = ideas[:10]
 
     # Build comprehensive prompt with ALL ideas
-    all_ideas_text = chr(10).join(
-        f"- \"{idea.get('content','')}\" (by {idea.get('author','unknown')}, {idea.get('votes',0)} votes, sentiment: {idea.get('sentiment','neutral')})"
+    NL = "\n"
+    all_ideas_text = NL.join(
+        '- "' + idea.get('content','') + '" (by ' + idea.get('author','unknown') + ', ' + str(idea.get('votes',0)) + ' votes, sentiment: ' + idea.get('sentiment','neutral') + ')'
         for idea in ideas
     )
 
-    cluster_text = chr(10).join(
-        f"- {c.get('label','Unnamed')}: {c.get('ideaCount', 0)} ideas, keywords: {', '.join(c.get('keywords', []))}"
-        for c in clusters
-    ) if clusters else "No clusters created yet."
+    cluster_lines = []
+    for c in clusters:
+        kws = ', '.join(c.get('keywords', []))
+        cluster_lines.append('- ' + c.get('label','Unnamed') + ': ' + str(c.get('ideaCount', 0)) + ' ideas, keywords: ' + kws)
+    cluster_text = NL.join(cluster_lines) if cluster_lines else "No clusters created yet."
 
-    prompt = f"""You are an expert project analyst. Generate a comprehensive PROJECT ABSTRACT and analysis for this brainstorming session.
+    top_ideas_text = NL.join(
+        '- "' + i.get('content','') + '" (' + str(i.get('votes',0)) + ' votes)'
+        for i in top_ideas[:5]
+    )
 
-PROJECT: {session_name}
-{f'DESCRIPTION: {session_desc}' if session_desc else ''}
-PARTICIPANTS: {total_participants}
-TOTAL IDEAS: {len(ideas)}
-CLUSTERS: {len(clusters)}
+    desc_line = 'DESCRIPTION: ' + session_desc if session_desc else ''
+    idea_count = str(len(ideas))
+    cluster_count = str(len(clusters))
 
-ALL IDEAS IN THIS SESSION:
-{all_ideas_text}
-
-THEMATIC CLUSTERS:
-{cluster_text}
-
-TOP VOTED IDEAS:
-{chr(10).join(f"- \"{i.get('content','')}\" ({i.get('votes',0)} votes)" for i in top_ideas[:5])}
-
-Generate a DETAILED JSON response with these sections:
-{{
-  "summary": "A comprehensive 3-4 paragraph project abstract that covers: 1) Overview of the brainstorming session and its purpose, 2) Key themes and patterns discovered across ALL ideas, 3) The most impactful and innovative ideas, 4) Overall assessment and potential next steps. Write it as a professional project abstract.",
-  "insights": ["5-7 specific, data-driven insights drawn from analyzing ALL the ideas. Reference specific ideas and patterns. Each insight should be actionable and substantive."],
-  "recommendations": ["3-5 concrete next-step recommendations based on the brainstorming results. Be specific about what actions to take and which ideas to pursue first."]
-}}
-
-IMPORTANT: Analyze ALL {len(ideas)} ideas thoroughly, not just the top ones. Find patterns, contradictions, gaps, and opportunities across the entire idea set."""
+    prompt = (
+        "You are an expert project analyst. Generate a comprehensive PROJECT ABSTRACT and analysis for this brainstorming session.\n\n"
+        "PROJECT: " + session_name + "\n"
+        + desc_line + "\n"
+        "PARTICIPANTS: " + str(total_participants) + "\n"
+        "TOTAL IDEAS: " + idea_count + "\n"
+        "CLUSTERS: " + cluster_count + "\n\n"
+        "ALL IDEAS IN THIS SESSION:\n"
+        + all_ideas_text + "\n\n"
+        "THEMATIC CLUSTERS:\n"
+        + cluster_text + "\n\n"
+        "TOP VOTED IDEAS:\n"
+        + top_ideas_text + "\n\n"
+        'Generate a DETAILED JSON response with these sections:\n'
+        '{\n'
+        '  "summary": "A comprehensive 3-4 paragraph project abstract that covers: 1) Overview of the brainstorming session and its purpose, 2) Key themes and patterns discovered across ALL ideas, 3) The most impactful and innovative ideas, 4) Overall assessment and potential next steps. Write it as a professional project abstract.",\n'
+        '  "insights": ["5-7 specific, data-driven insights drawn from analyzing ALL the ideas. Reference specific ideas and patterns. Each insight should be actionable and substantive."],\n'
+        '  "recommendations": ["3-5 concrete next-step recommendations based on the brainstorming results. Be specific about what actions to take and which ideas to pursue first."]\n'
+        '}\n\n'
+        "IMPORTANT: Analyze ALL " + idea_count + " ideas thoroughly, not just the top ones. Find patterns, contradictions, gaps, and opportunities across the entire idea set."
+    )
 
     if model is None:
         return jsonify({

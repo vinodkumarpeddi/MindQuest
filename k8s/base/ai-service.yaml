@@ -20,7 +20,8 @@ spec:
     spec:
       containers:
         - name: ai
-          image: ghcr.io/vinodkumarpeddi/mindquest-ai:latest
+          image: mindquest-ai:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 5001
           env:
@@ -29,6 +30,8 @@ spec:
                 secretKeyRef:
                   name: mindquest-secrets
                   key: GEMINI_API_KEY
+            - name: PORT
+              value: "5001"
           resources:
             requests:
               memory: "256Mi"
@@ -36,27 +39,12 @@ spec:
             limits:
               memory: "1Gi"
               cpu: "1000m"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 5001
-            initialDelaySeconds: 15
-            periodSeconds: 20
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 5001
-            initialDelaySeconds: 10
-            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mindquest-ai
   namespace: mindquest
-  labels:
-    app: mindquest
-    component: ai
 spec:
   selector:
     app: mindquest
@@ -64,5 +52,3 @@ spec:
   ports:
     - port: 5001
       targetPort: 5001
-      protocol: TCP
-  type: ClusterIP
