@@ -1,8 +1,21 @@
 {
+  "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/health", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  ],
+  "env": {
+    "MONGO_URI": "@mongo-uri",
+    "JWT_SECRET": "@jwt-secret",
+    "GEMINI_API_KEY": "@gemini-api-key",
+    "EMAIL_HOST": "smtp.gmail.com",
+    "EMAIL_PORT": "587",
+    "EMAIL_USER": "@email-user",
+    "EMAIL_PASSWORD": "@email-password",
+    "AI_SERVICE_URL": "https://vinodkumarpeddi-mindquest-ai.hf.space"
+  }
 }
