@@ -1,3 +1,12 @@
+---
+title: MindQuest AI
+emoji: 🧠
+colorFrom: blue
+colorTo: purple
+sdk: docker
+pinned: false
+---
+
 # MindQuest AI Service
 
 Python-based AI microservice for MindQuest brainstorming platform.
@@ -10,23 +19,8 @@ Python-based AI microservice for MindQuest brainstorming platform.
 - **Sentiment Analysis**: Gemini AI powered sentiment classification
 - **Idea Generation**: Creative suggestions using Gemini Pro
 - **Session Summaries**: Comprehensive summaries with insights
+- **AI Chat**: Context-aware brainstorming assistant
 - **Keyword Extraction**: TF-IDF based keyword identification
-
-## Setup
-
-```bash
-cd ai_service
-pip install -r requirements.txt
-python app.py
-```
-
-The service runs on port 5000.
-
-## Environment Variables
-
-```
-GEMINI_API_KEY=your_api_key_here
-```
 
 ## Endpoints
 
@@ -35,4 +29,5 @@ GEMINI_API_KEY=your_api_key_here
 - `POST /advanced-cluster` - Cluster using DBSCAN
 - `POST /summarize` - Generate session summary
 - `POST /generate-ideas` - Generate new ideas
+- `POST /chat` - AI chat about session
 - `GET /health` - Health check
