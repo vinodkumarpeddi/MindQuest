@@ -11,7 +11,7 @@ import DarkModeToggle from '../components/DarkModeToggle';
 import ChatSidebar from '../components/ChatSidebar';
 import PriorityMatrix from '../components/PriorityMatrix';
 import TimerRounds from '../components/TimerRounds';
-import { ArrowLeft, MessageSquare, Grid3X3, Timer, Sparkles, Brain, ZoomIn, ZoomOut, Maximize, Mouse } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Grid3X3, Timer, Sparkles, Brain, Mouse } from 'lucide-react';
 
 export default function Board() {
   const { sessionId } = useParams();
@@ -74,7 +74,6 @@ export default function Board() {
   const handleBoardMouseMove = (e) => { if (isDragging) setOffset({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }); };
   const handleBoardMouseUp = () => setIsDragging(false);
   const handleWheel = (e) => { e.preventDefault(); setScale(prev => Math.max(0.3, Math.min(2.5, prev * (e.deltaY > 0 ? 0.9 : 1.1)))); };
-  const resetView = () => { setScale(1); setOffset({ x: 0, y: 0 }); };
 
   const iconBtn = (active) => `p-2.5 rounded-xl transition-all duration-200 ${active ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/25' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-800 dark:hover:text-white'}`;
 
@@ -120,8 +119,17 @@ export default function Board() {
           </div>
         </div>
 
-        {/* Right side utilities */}
-        <div className="flex items-center space-x-1">
+        {/* Toolbar + utilities */}
+        <div className="flex items-center space-x-1.5">
+          <Toolbar
+            onAddIdea={handleAddIdea} onCluster={handleCluster}
+            onShowClusters={() => setShowClusters(true)} onShowSummary={() => setShowSummary(true)}
+            sessionId={sessionId} scale={scale}
+            onZoomIn={() => setScale(prev => Math.min(2.5, prev * 1.2))}
+            onZoomOut={() => setScale(prev => Math.max(0.3, prev / 1.2))}
+            isOwner={session?.owner?._id === user?._id}
+          />
+          <div className="h-6 w-px bg-gray-200/50 dark:bg-gray-700/50 mx-0.5" />
           <button onClick={() => setShowTimer(!showTimer)} className={iconBtn(showTimer)} title="Timer">
             <Timer className="w-4 h-4" />
           </button>
@@ -131,7 +139,7 @@ export default function Board() {
           <button onClick={() => setShowChat(!showChat)} className={iconBtn(showChat)} title="AI Chat">
             <MessageSquare className="w-4 h-4" />
           </button>
-          <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1" />
+          <div className="h-6 w-px bg-gray-200/50 dark:bg-gray-700/50 mx-0.5" />
           <DarkModeToggle />
         </div>
       </div>
@@ -171,35 +179,9 @@ export default function Board() {
         )}
       </div>
 
-      {/* Floating Bottom Toolbar */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 animate-slide-up">
-        <div className="glass rounded-2xl shadow-modal px-3 py-2.5 flex items-center space-x-1.5 border border-gray-200/30 dark:border-gray-700/30">
-          <Toolbar
-            onAddIdea={handleAddIdea} onCluster={handleCluster}
-            onShowClusters={() => setShowClusters(true)} onShowSummary={() => setShowSummary(true)}
-            sessionId={sessionId} scale={scale}
-            onZoomIn={() => setScale(prev => Math.min(2.5, prev * 1.2))}
-            onZoomOut={() => setScale(prev => Math.max(0.3, prev / 1.2))}
-            isOwner={session?.owner?._id === user?._id}
-          />
-        </div>
-      </div>
-
-      {/* Zoom controls - bottom left */}
-      <div className="absolute bottom-5 left-4 z-10 flex items-center space-x-1">
-        <div className="glass rounded-xl px-1 py-1 flex items-center space-x-0.5 border border-gray-200/30 dark:border-gray-700/30">
-          <button onClick={() => setScale(prev => Math.max(0.3, prev / 1.2))} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-            <ZoomOut className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-          </button>
-          <span className="text-[11px] font-mono font-medium text-gray-500 dark:text-gray-400 w-10 text-center">{Math.round(scale * 100)}%</span>
-          <button onClick={() => setScale(prev => Math.min(2.5, prev * 1.2))} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-            <ZoomIn className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-          </button>
-          <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" />
-          <button onClick={resetView} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" title="Reset view">
-            <Maximize className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-          </button>
-        </div>
+      {/* Zoom indicator - bottom left */}
+      <div className="absolute bottom-4 left-4 z-10 glass rounded-xl px-3 py-1.5 border border-gray-200/30 dark:border-gray-700/30 text-xs font-mono font-medium text-gray-500 dark:text-gray-400">
+        {Math.round(scale * 100)}%
       </div>
 
       {showTimer && <TimerRounds onClose={() => setShowTimer(false)} socket={socket} sessionId={sessionId} />}
