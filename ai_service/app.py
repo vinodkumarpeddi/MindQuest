@@ -622,4 +622,5 @@ if __name__ == '__main__':
         print("🤖 AI Model: Google Gemini Pro (gemini-1.0-pro)")
     else:
         print("⚠️ AI Model: Google Gemini Pro FAILED to initialize. Endpoints will use fallback logic.")
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=os.environ.get('NODE_ENV') != 'production')
