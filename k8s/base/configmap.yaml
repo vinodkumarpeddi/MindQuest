@@ -8,4 +8,4 @@ data:
   AI_SERVICE_URL: "http://mindquest-ai:5001"
   EMAIL_HOST: "smtp.gmail.com"
   EMAIL_PORT: "587"
-  FRONTEND_URL: "https://mindquest.example.com"
+  FRONTEND_URL: "http://localhost:30080"
