@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: mindquest
+  namespace: argocd
+spec:
+  description: MindQuest AI Brainstorming Platform
+
+  sourceRepos:
+    - https://github.com/vinodkumarpeddi/MindQuest.git  # Replace OWNER
+
+  destinations:
+    - namespace: mindquest
+      server: https://kubernetes.default.svc
+    - namespace: mindquest-staging
+      server: https://kubernetes.default.svc
+
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+
+  namespaceResourceWhitelist:
+    - group: ''
+      kind: '*'
+    - group: apps
+      kind: '*'
+    - group: networking.k8s.io
+      kind: '*'

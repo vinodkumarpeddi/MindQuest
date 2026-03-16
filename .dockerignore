@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.github
+.env
+server/.env
+ai_service/venv
+ai_service/__pycache__
+*.log
+.DS_Store
+k8s
+argocd
+venv
